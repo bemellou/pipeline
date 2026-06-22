@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bemellou — Funding Pipeline</title>
+<style>
+  :root{
+    --bg:#0e1014; --panel:#161922; --panel2:#1d212c; --line:#2a3040; --line2:#353c4d;
+    --text:#eef1f7; --muted:#98a2b3; --accent:#6ea8fe; --accent2:#a78bfa;
+    --green:#46c08a; --amber:#e7b15a; --red:#ec6479; --gray:#5b6573; --chip:#222838;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--text);font-size:14px;line-height:1.45}
+  a{color:var(--accent);text-decoration:none} a:hover{text-decoration:underline}
+  header{padding:18px 26px 0;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:30}
+  .title-row{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap;justify-content:space-between}
+  h1{font-size:21px;margin:0;font-weight:800;letter-spacing:.2px}
+  h1 span{background:linear-gradient(90deg,#6ea8fe,#a78bfa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{color:var(--muted);font-size:12.5px;margin-top:4px}
+  .toolbtns{display:flex;gap:8px;flex-wrap:wrap}
+  button,select,input,textarea{font-family:inherit}
+  .btn{background:var(--panel2);color:var(--text);border:1px solid var(--line2);padding:8px 13px;border-radius:9px;cursor:pointer;font-size:13px;transition:.15s}
+  .btn:hover{border-color:var(--accent);background:#232a3a}
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin:14px 0 4px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 15px;min-width:96px;cursor:pointer;transition:.15s}
+  .stat:hover{border-color:var(--accent)}
+  .stat .n{font-size:23px;font-weight:800;line-height:1}
+  .stat .l{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:5px}
+  .stat.urgent .n{color:var(--red)} .stat.soon .n{color:var(--amber)} .stat.fit .n{color:var(--accent2)} .stat.won .n{color:var(--green)}
+  /* closing-soon hero */
+  .hero{padding:14px 26px 16px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#12151d,#0e1014)}
+  .hero-h{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:9px;font-weight:700}
+  .hero-scroll{display:flex;gap:11px;overflow-x:auto;padding-bottom:4px}
+  .dcard{flex:0 0 198px;background:var(--panel2);border:1px solid var(--line2);border-left:3px solid var(--amber);border-radius:11px;padding:11px 12px;text-decoration:none;color:var(--text);transition:.15s}
+  .dcard:hover{border-color:var(--accent);text-decoration:none;transform:translateY(-1px)}
+  .dcard.u{border-left-color:var(--red)}
+  .dcard .dd{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.3px}
+  .dcard.u .dd{color:var(--red)}
+  .dcard .dn{font-size:13px;font-weight:700;margin:5px 0 4px;line-height:1.25}
+  .dcard .da{font-size:11.5px;color:var(--green);font-weight:600}
+  .dcard .dg{font-size:10.5px;color:var(--muted);margin-top:3px}
+  .toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:13px 26px;border-bottom:1px solid var(--line);background:var(--bg);position:sticky;top:64px;z-index:20}
+  .search{flex:1;min-width:200px;background:var(--panel);border:1px solid var(--line2);color:var(--text);padding:10px 13px;border-radius:10px;font-size:13.5px}
+  .search:focus{outline:none;border-color:var(--accent)}
+  select{background:var(--panel);border:1px solid var(--line2);color:var(--text);padding:9px 11px;border-radius:10px;cursor:pointer;font-size:13px}
+  .chips{display:flex;gap:7px;flex-wrap:wrap;padding:13px 26px 2px}
+  .chip{background:var(--chip);border:1px solid var(--line2);color:var(--muted);padding:6px 13px;border-radius:20px;cursor:pointer;font-size:12.5px;transition:.15s;font-weight:600}
+  .chip:hover{color:var(--text);border-color:var(--accent)}
+  .chip.active{background:var(--accent);color:#0a0f1a;border-color:var(--accent)}
+  .chip.star.active{background:var(--accent2);border-color:var(--accent2);color:#fff}
+  .chip.nd.active{background:var(--green);border-color:var(--green);color:#062013}
+  .wrap{padding:14px 26px 90px}
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);padding:8px 11px;border-bottom:1px solid var(--line2);cursor:pointer;white-space:nowrap;position:sticky;top:116px;background:var(--bg);z-index:5}
+  th:hover{color:var(--text)}
+  td{padding:11px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr.row:hover{background:var(--panel)}
+  .name{font-weight:700;font-size:14px;line-height:1.3}
+  .fit{color:var(--muted);font-size:12px;margin-top:3px;max-width:360px}
+  .star-i{color:var(--accent2)}
+  .badge{display:inline-block;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:700;white-space:nowrap}
+  .b-urgent{background:rgba(236,100,121,.16);color:#ff8c9c} .b-soon{background:rgba(231,177,90,.16);color:#f2c987}
+  .b-ok{background:rgba(70,192,138,.14);color:#84d6ae} .b-roll{background:#222838;color:#aeb6c4} .b-win{background:#222838;color:#8a93a3} .b-past{background:#191c23;color:var(--gray)}
+  .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+  .tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10.5px;background:var(--chip);color:var(--muted);border:1px solid var(--line2);white-space:nowrap;font-weight:600}
+  .tag.t-type{color:#b9c4d6}
+  .tag.nd-yes{color:#84d6ae;border-color:rgba(70,192,138,.35);background:rgba(70,192,138,.08)}
+  .tag.nd-no{color:#f2c987;border-color:rgba(231,177,90,.3)}
+  .tag.e-Women,.tag.e-BIPOC{color:#cdb4ff;border-color:rgba(167,139,250,.35)}
+  .tag.e-Open{color:#84d6ae;border-color:rgba(70,192,138,.3)}
+  .tag.e-Region,.tag.e-Nonprofit,.tag.e-Dairy,.tag.e-AI{color:#f2c987;border-color:rgba(231,177,90,.25)}
+  .award{font-size:13px;white-space:nowrap;font-weight:600}
+  .award b{color:#84d6ae}
+  select.status{padding:6px 7px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid var(--line2);cursor:pointer}
+  .st-Backlog{background:#222838;color:var(--muted)}
+  .st-Interested{background:rgba(110,168,254,.16);color:#9cc2ff}
+  .st-Applying{background:rgba(231,177,90,.16);color:#f2c987}
+  .st-Submitted{background:rgba(167,139,250,.2);color:#cdb4ff}
+  .st-Won{background:rgba(70,192,138,.22);color:#84d6ae}
+  .st-Rejected{background:rgba(236,100,121,.16);color:#ff8c9c}
+  .st-Skip{background:#1b1e25;color:var(--gray)}
+  .notes{width:100%;min-height:30px;background:transparent;border:1px dashed transparent;color:var(--text);font-size:12px;padding:4px 6px;border-radius:7px;resize:vertical;font-family:inherit;line-height:1.4}
+  .notes:hover{border-color:var(--line2)} .notes:focus{border-color:var(--accent);background:var(--panel);outline:none}
+  .board{display:flex;gap:13px;overflow-x:auto;padding-bottom:20px}
+  .col{flex:0 0 270px;background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:11px;min-height:200px}
+  .col h3{margin:0 0 10px;font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;display:flex;justify-content:space-between}
+  .col h3 .c{color:var(--muted)}
+  .card{background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:10px;margin-bottom:8px;cursor:grab}
+  .card:active{cursor:grabbing} .card.drag{opacity:.4} .col.over{border-color:var(--accent);background:#1a2030}
+  .card .cn{font-weight:700;font-size:12.5px} .card .cm{font-size:10.5px;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between;gap:6px;align-items:center}
+  .hidden{display:none}
+  .empty{color:var(--muted);text-align:center;padding:50px;font-size:14px}
+  .footnote{color:var(--gray);font-size:11.5px;padding:6px 26px 30px;line-height:1.6}
+  ::-webkit-scrollbar{height:10px;width:10px}::-webkit-scrollbar-thumb{background:#2a3040;border-radius:6px}::-webkit-scrollbar-track{background:transparent}
+  .conn{font-weight:700;font-size:11.5px}.conn.local{color:var(--amber)}.conn.live{color:var(--green)}.conn.err{color:var(--red)}
+  #who,#who a{color:var(--muted);font-size:11.5px}#who a{color:var(--accent)}
+</style>
+</head>
+<body>
+<header>
+  <div class="title-row">
+    <div>
+      <h1>Bemellou <span>Funding Pipeline</span></h1>
+      <div class="sub" id="sub">Loading…</div>
+      <div class="sub" style="margin-top:5px"><span id="conn" class="conn local">● Local only</span> &nbsp; <span id="who"></span></div>
+    </div>
+    <div class="toolbtns">
+      <button class="btn" id="viewBtn">▦ Board view</button>
+      <button class="btn" id="exportBtn">⭳ Export</button>
+      <button class="btn" id="importBtn">⭱ Import</button>
+      <input type="file" id="importFile" accept="application/json" class="hidden">
+    </div>
+  </div>
+  <div class="stats" id="stats"></div>
+</header>
+
+<div class="hero">
+  <div class="hero-h">⚡ Closing soon — next deadlines</div>
+  <div class="hero-scroll" id="hero"></div>
+</div>
+
+<div class="toolbar">
+  <input class="search" id="search" placeholder="🔍  Search programs, awards, fit, eligibility…">
+  <select id="catFilter"><option value="">All themes</option></select>
+  <select id="typeFilter"><option value="">All types</option></select>
+  <select id="eligFilter"><option value="">All eligibility</option></select>
+  <select id="statusFilter"><option value="">All statuses</option></select>
+  <select id="sort">
+    <option value="deadline">Sort: Soonest deadline</option>
+    <option value="award">Sort: Biggest award</option>
+    <option value="fit">Sort: Top fits first</option>
+    <option value="name">Sort: A–Z</option>
+  </select>
+</div>
+<div class="chips" id="chips"></div>
+
+<div class="wrap">
+  <div id="tableView">
+    <table>
+      <thead><tr>
+        <th data-s="status">Status</th>
+        <th data-s="name">Program</th>
+        <th data-s="type">Type / Tags</th>
+        <th data-s="deadline">Deadline</th>
+        <th data-s="award">Award</th>
+        <th>Notes</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty hidden" id="emptyMsg">No programs match your filters.</div>
+  </div>
+  <div id="boardView" class="board hidden"></div>
+</div>
+<div class="footnote">
+  <b>★ = top fit</b> for Bemellou (wellness · consumer product + community app · student founders · non-dilutive). &nbsp;
+  💵 <b>Non-dilutive</b> = no equity taken · <b>Equity</b> = accelerator takes a stake. &nbsp;
+  Deadlines recompute every time you open this. Progress saves in this browser — <b>Export</b> before clearing data. &nbsp;
+  Dilutive VC/angel funds intentionally excluded. Full raw list: COMPETITIONS_MASTER.md.
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const STATUSES=["Backlog","Interested","Applying","Submitted","Won","Rejected","Skip"];
+// d=deadline ISO|null · w=display · a=rough $ for sort · t=type · nd=non-dilutive · s=star top-fit · c=theme · e=eligibility gate
+const DATA=[
+// ===== WELLNESS / HEALTH =====
+{id:"hlth",n:"HLTH USA 2026 Pitch",c:"Wellness",e:"Open",t:"Competition",nd:1,s:1,d:"2026-06-26",w:"Jun 26, 2026",a:25000,aw:"$25K + passes",fit:"Consumer-wellness winner last year. <5yrs, <$8M raised.",l:"https://hlth.com/events/usa/agenda/startup-pitch/"},
+{id:"sharktank",n:"Shark Tank of Wellness (GWS)",c:"Wellness",e:"Student",t:"Competition",nd:1,s:1,d:"2026-06-30",w:"Jun 30, 2026",a:5000,aw:"$5K/$3K/$2K + Summit trip",fit:"★ Best thematic match. Student wellness pitch; needs faculty advisor.",l:"https://www.globalwellnesssummit.com/2026-shark-tank-student-competition/"},
+{id:"enlight",n:"Enlight Fellowship (Watson)",c:"Wellness",e:"Open",t:"Fellowship",nd:1,s:1,d:"2026-07-05",w:"Jul 5 (priority)",a:15000,aw:"Fully funded",fit:"★ Youth mental-wellbeing founders — tailor-made.",l:"https://watson.is/enlight-fellowship/"},
+{id:"xcelerate",n:"Xcelerate Pitch (World Health Expo)",c:"Wellness",e:"Open",t:"Competition",nd:1,d:"2026-08-01",w:"Aug 1, 2026",a:50000,aw:"$50K pool",fit:"~50 health startups, 12 finalists.",l:"https://www.worldhealthexpo.com/events/healthcare/tech/en/whats-on/features/xcelerate-your-startup-pitch-competition.html"},
+{id:"morganstanley-mh",n:"Morgan Stanley Children's Mental Health Awards",c:"Wellness",e:"Nonprofit",t:"Grant",nd:1,d:"2026-07-24",w:"~Jul 24, 2026",a:100000,aw:"$25K–$100K",fit:"Youth mental health; Next Gen needs nonprofit + under-32 founder.",l:"https://www.morganstanley.com/about-us/giving-back/childrens-mental-health-awards"},
+{id:"longevity",n:"Longevity Show Pitch",c:"Wellness",e:"Open",t:"Competition",nd:1,d:null,w:"Pitch day Jun 26, 2026",a:0,aw:"VC pitch + recognition",fit:"Consumer longevity/wellness/mindfulness (London).",l:"https://longevityshow.com/b2b-conference/pitch-competition/"},
+{id:"bu-wellbeing",n:"BU Student Wellbeing Competition",c:"Wellness",e:"Student",t:"Competition",nd:1,s:1,d:null,w:"~Jan 2027",a:10000,aw:"$10K/$6K/$4K",fit:"★ Student wellbeing innovations — dead-on theme.",l:"https://www.bu.edu/hospitality/events/innovation-competition/12-5k-student-wellbeing-competition/"},
+{id:"hollomon",n:"UW Hollomon Health Innovation Challenge",c:"Wellness",e:"Student",t:"Competition",nd:1,d:null,w:"~Feb 2027",a:15000,aw:"$15K/$10K/$5K",fit:"Student health-innovation comp.",l:"https://foster.uw.edu/centers/buerk-ctr-entrepreneurship/entrepreneurship-competitions/uw-health-innovation-challenge/"},
+{id:"startupprize",n:"Startup Prize: Health",c:"Wellness",e:"Open",t:"Competition",nd:1,d:null,w:"Recurring (watch)",a:10000,aw:"~$10K + investors",fit:"Preventive care, nutrition, wellness.",l:"https://startupprize.com/"},
+{id:"seedspot-mh",n:"SEED SPOT Mental & Behavioral Health Accelerator",c:"Wellness",e:"Open",t:"Accelerator",nd:1,d:null,w:"Cohort ~Jan–Mar",a:0,aw:"Equity-free + network",fit:"Early mental/behavioral health; no equity.",l:"https://seedspot.org/mental-behavioral-health-focused-impact-accelerator/"},
+{id:"whatif",n:"What If Ventures Fellowship",c:"Wellness",e:"Open",t:"Fellowship",nd:1,d:null,w:"Rolling",a:0,aw:"Program + capital",fit:"Leading accelerator for mental-health startups.",l:"https://whatif.vc/"},
+{id:"empowered",n:"EmPOWERED to Serve Accelerator (AHA)",c:"Wellness",e:"Open",t:"Accelerator",nd:1,d:null,w:"Apps when open",a:0,aw:"Grant + training",fit:"Pre-seed health/food/wellness.",l:"https://www.empoweredtoserve.org/en/business-accelerator-program"},
+{id:"georgetown-health",n:"Georgetown Entrepreneurship in Health",c:"Wellness",e:"Student",t:"Competition",nd:1,d:null,w:"Annual",a:2000,aw:"$2K/$1K/$500",fit:"Student health ventures.",l:"https://eship.georgetown.edu/entrepreneurship-in-health/"},
+
+// ===== CONSUMER / CPG =====
+{id:"ulta",n:"Ulta Beauty MUSE Accelerator",c:"Consumer/CPG",e:"BIPOC",t:"Accelerator",nd:1,s:1,d:"2026-06-28",w:"Jun 28, 2026",a:50000,aw:"$50K non-dilutive",fit:"★ 8 beauty/wellness brands. Centers BIPOC founders.",l:"https://www.ulta.com/company/dei/muse/muse-accelerator"},
+{id:"makers",n:"Makers Mindset Grant",c:"Consumer/CPG",e:"Women",t:"Grant",nd:1,d:"2026-07-22",w:"Jul 22, 2026",a:10000,aw:"3 × $10K",fit:"Women-owned CPG (beauty/food/bev/wellness).",l:"https://www.makersmindset.com/"},
+{id:"rcm",n:"Real California Milk Excelerator",c:"Consumer/CPG",e:"Dairy",t:"Accelerator",nd:1,d:"2026-07-24",w:"Jul 24, 2026",a:0,aw:"Non-dilutive support",fit:"Only if product is ≥50% dairy.",l:"https://info.venturefuel.net/rcmexcelerator"},
+{id:"great-brands",n:"Collegiate Great Brands (UGA)",c:"Consumer/CPG",e:"Student",t:"Competition",nd:1,s:1,d:null,w:"~Dec 2026/Jan 2027",a:25000,aw:"$25K pool + NYC show",fit:"★ Student-founded consumer brands, <$2M. Ideal.",l:"https://www.terry.uga.edu/entrepreneurship/collegiate-brands/"},
+{id:"naturally-rising",n:"Naturally Rising (Naturally Network)",c:"Consumer/CPG",e:"Open",t:"Competition",nd:1,s:1,d:null,w:"Late 2026/early 2027",a:5000,aw:"$5K+ + national stage",fit:"★ Wellness CPG; needs retail partner + chapter.",l:"https://www.naturallynetwork.org/pitchslam"},
+{id:"naturally-chi",n:"Naturally Chicago Pitch Slam",c:"Consumer/CPG",e:"Region",t:"Competition",nd:1,s:1,d:null,w:"Annual ~May (Chicago)",a:150000,aw:"$150K+ services",fit:"★ Wellness CPG <$2M, Chicago tie — home turf.",l:"https://www.naturallychicago.org/pitchslam2026-1"},
+{id:"target-ff",n:"Target Forward Founders",c:"Consumer/CPG",e:"Open",t:"Accelerator",nd:1,d:null,w:"Rolling intake",a:0,aw:"Equity-free + buyer access",fit:"Early consumer brands → retail. Very early OK.",l:"https://accelerators.target.com/programs/"},
+{id:"walmart-oc",n:"Walmart Annual Open Call",c:"Consumer/CPG",e:"Open",t:"Competition",nd:1,d:null,w:"Open → event Oct 6–7",a:0,aw:"Purchase orders",fit:"Needs US-made, UPC, retail packaging.",l:"https://corporate.walmart.com/suppliers/investing-in-american-jobs/events/annual-open-call/open-call-2026"},
+{id:"chobani",n:"Chobani Incubator",c:"Consumer/CPG",e:"Open",t:"Incubator",nd:1,d:null,w:"Apps when open",a:0,aw:"Equity-free capital + mentorship",fit:"Early food/bev w/ traction (<$10M).",l:"https://chobaniincubator.com/"},
+{id:"foodfoundry",n:"Food Foundry (Relish Works)",c:"Consumer/CPG",e:"Open",t:"Accelerator",nd:1,d:null,w:"Annual cohort",a:15000,aw:"$15K equity-free + mentorship",fit:"Pre-seed/seed food startups.",l:"https://www.relishworks.com/"},
+{id:"calnutri",n:"CalNutri Accelerate",c:"Consumer/CPG",e:"Open",t:"Accelerator",nd:1,d:null,w:"~Jan 2027",a:0,aw:"Services-for-investment, no fee",fit:"Supplements/personal care/wellness CPG.",l:"https://calnutri.com/accelerator"},
+{id:"ift",n:"IFT FIRST Startup Pitch",c:"Consumer/CPG",e:"Open",t:"Competition",nd:1,d:null,w:"Event Jul 12–15 (Chicago)",a:10000,aw:"$10K + two $2.5K",fit:"Food science/tech & ingredient startups.",l:"https://www.iftevent.org/"},
+{id:"nosh",n:"NOSH / New Beverage Showdown (BevNET)",c:"Consumer/CPG",e:"Open",t:"Competition",nd:1,d:null,w:"At NOSH/BevNET events",a:10000,aw:"$10K ad package + media",fit:"Early packaged food / beverage brands.",l:"https://www.nosh.com/"},
+{id:"sial",n:"SIAL Canada Startup Pitch",c:"Consumer/CPG",e:"Open",t:"Competition",nd:1,d:null,w:"~Apr 30 (US can apply)",a:0,aw:"Cash + exposure",fit:"Seed & Scale CPG tracks.",l:"https://sialcanada.com/en/pitch-competition/"},
+{id:"foodprize",n:"Food Prize",c:"Consumer/CPG",e:"Open",t:"Competition",nd:1,d:null,w:"Annual",a:40000,aw:"up to $40K",fit:"Food service & manufacturing tracks.",l:"https://kelloggarena.com/event/food-prize-2026/"},
+{id:"enthuse-grant",n:"Enthuse Foundation Grant",c:"Consumer/CPG",e:"Women",t:"Grant",nd:1,d:null,w:"~Apr (annual)",a:5000,aw:"~$37K across 8",fit:"Women-identifying US, full-time CPG.",l:"https://www.enthusefoundation.org/grant-program"},
+{id:"potluck",n:"Project Potluck Grants",c:"Consumer/CPG",e:"BIPOC",t:"Grant",nd:1,d:null,w:"~spring (annual)",a:10000,aw:"$10K awards",fit:"BIPOC CPG founders.",l:"https://www.potluckcpg.org/grants/"},
+{id:"stacys",n:"Stacy's Rise Project (Hello Alice)",c:"Consumer/CPG",e:"Women",t:"Grant",nd:1,d:null,w:"Annual",a:25000,aw:"$25K (×10–15)",fit:"Women in food & beverage, WOC emphasis.",l:"https://helloalice.com/funding/grants/"},
+{id:"beyondcpg",n:"BeyondCPG (Track 7)",c:"Consumer/CPG",e:"Open",t:"Accelerator",nd:1,d:null,w:"Apps open",a:0,aw:"Operator/retail network",fit:"Scaling food/bev/wellness brands.",l:"https://www.nosh.com/"},
+{id:"wholefoods",n:"Whole Foods LEAP / On the Verge",c:"Consumer/CPG",e:"Open",t:"Accelerator",nd:1,d:null,w:"Rolling/annual",a:0,aw:"Retail placement",fit:"Emerging consumer wellness/CPG → retail.",l:"https://www.foodnavigator-usa.com/"},
+{id:"pitchperfect",n:"Pitch Perfect Grant",c:"Consumer/CPG",e:"Open",t:"Grant",nd:1,d:null,w:"Quarterly (~Jul 15)",a:5000,aw:"$5K",fit:"US/Canada small biz, CPG eligible.",l:"https://grantaura.com/grant/pitch-perfect-grants/"},
+
+// ===== STUDENT / COLLEGIATE / YOUNG FOUNDER =====
+{id:"baylor",n:"Baylor New Venture Competition",c:"Student",e:"Student",t:"Competition",nd:1,s:1,d:"2026-10-01",w:"Oct 1, 2026",a:200000,aw:"$200K+ prize pool",fit:"★ Any college student worldwide, any industry. Top pick.",l:"https://hankamer.baylor.edu/baugh-center/new-venture"},
+{id:"ceo-global",n:"CEO Global Pitch Competition",c:"Student",e:"Student",t:"Competition",nd:1,d:"2026-10-18",w:"Oct 18 (video Oct 27)",a:20000,aw:"$20K pool",fit:"Largest US collegiate pitch. Needs CEO campus chapter.",l:"https://www.joinceo.org/events/globalconference"},
+{id:"gsea",n:"Global Student Entrepreneur Awards",c:"Student",e:"Student",t:"Competition",nd:1,s:1,d:null,w:"~Nov 30, 2026 (by chapter)",a:100000,aw:"$100K+ pool",fit:"★ Exact profile: students running a real business.",l:"https://gsea.org/"},
+{id:"efest",n:"e-Fest (Schulze)",c:"Student",e:"Student",t:"Competition",nd:1,s:1,d:null,w:"~Jan 2027",a:250000,aw:"$250K share",fit:"★ Undergrad-only national competition.",l:"https://efest.biz/"},
+{id:"tigerlaunch",n:"TigerLaunch (Princeton)",c:"Student",e:"Student",t:"Competition",nd:1,d:null,w:"~Dec 2026",a:60000,aw:"$60K+",fit:"World's largest student-run comp. Any college.",l:"https://tigerlaunch.com/"},
+{id:"hult",n:"Hult Prize",c:"Student",e:"Student",t:"Competition",nd:1,d:null,w:"Campus rounds ~Feb",a:1000000,aw:"$1M seed",fit:"Student teams; frame around a UN SDG (wellbeing).",l:"https://www.hultprize.org/"},
+{id:"rice",n:"Rice Business Plan Competition",c:"Student",e:"Student",t:"Competition",nd:1,d:null,w:"~Jan 2027",a:1000000,aw:"$1M+",fit:"World's richest — but needs a grad-student co-founder.",l:"https://rbpc.rice.edu/"},
+{id:"americas-startup",n:"America's Startup (America250)",c:"Student",e:"Student",t:"Competition",nd:1,d:null,w:"Early 2027",a:25000,aw:"10 × $25K",fit:"US college students, any venture.",l:"https://america250.org/americas-startup/apply/"},
+{id:"blue-ocean",n:"Blue Ocean Student Competition",c:"Student",e:"Student",t:"Competition",nd:1,d:null,w:"Rolling rounds",a:5000,aw:"Cash",fit:"Online video pitch; low-barrier early fit.",l:"https://blueoceancompetition.org/"},
+{id:"stuclark",n:"Stu Clark New Venture Championships",c:"Student",e:"Student",t:"Competition",nd:1,d:null,w:"Apply by ~Mar 10",a:72000,aw:"$72K+",fit:"Global student teams.",l:"https://umanitoba.ca/asper/stu-clark-centre-for-entrepreneurship/stu-clark-new-venture-championships"},
+{id:"uoregon-nvc",n:"U Oregon New Venture Championship",c:"Student",e:"Student",t:"Competition",nd:1,d:null,w:"~spring 2027",a:50000,aw:"$50K+",fit:"Universities worldwide, any industry.",l:"https://business.uoregon.edu/hands-on-learning/competitions/nvc"},
+{id:"mit100k",n:"MIT $100K",c:"Student",e:"Single-school",t:"Competition",nd:1,d:null,w:"Sept–May",a:100000,aw:"$300K+ pool",fit:"Needs an MIT student on the team.",l:"https://www.mit100k.org/"},
+{id:"cornell-emc",n:"Cornell EMC² Mark Mobius Pitch",c:"Student",e:"Open",t:"Competition",nd:1,d:null,w:"Register ~Apr",a:30000,aw:"$30K winner",fit:"Open global entrants.",l:"https://business.cornell.edu/centers/ccem/conference/pitch-competition/"},
+{id:"uga-nte",n:"UGA Next Top Entrepreneur",c:"Student",e:"Student",t:"Competition",nd:1,d:null,w:"Apply ~Mar 20",a:10000,aw:"$10K/$5K/$2.5K",fit:"Any college student venture.",l:"https://www.terry.uga.edu/entrepreneurship/next-top-entrepreneur/"},
+{id:"vcic",n:"VC Investment Competition (VCIC)",c:"Student",e:"Student",t:"Competition",nd:1,d:null,w:"Regionals ~Mar",a:0,aw:"Recognition",fit:"VC-role competition; 120+ teams.",l:"https://www.vcic.org/"},
+{id:"draper-women",n:"Draper Competition (Smith)",c:"Student",e:"Women",t:"Competition",nd:1,d:null,w:"~spring",a:100000,aw:"$100K+",fit:"Undergrad women — strong consumer fit.",l:"https://www.smith.edu/academics/conway-center/entrepreneurship/draper-competition"},
+{id:"wbenc-coll",n:"WBENC Collegiate Accelerator",c:"Student",e:"Women",t:"Accelerator",nd:1,d:null,w:"~early 2027",a:5000,aw:"Non-dilutive + trip",fit:"Women collegiate founders.",l:"https://www.wbenc.org/programs/collegiate-accelerator/"},
+{id:"blackstone-lp",n:"Blackstone LaunchPad Fellowship",c:"Student",e:"Student",t:"Fellowship",nd:1,d:null,w:"Annual summer",a:5000,aw:"$5K non-dilutive",fit:"College students/recent grads w/ startups.",l:"https://www.blackstone.com/our-impact/blackstone-launchpad/"},
+{id:"future-founders",n:"Future Founders Fellowship",c:"Student",e:"Open",t:"Fellowship",nd:1,s:1,d:null,w:"Reopens ~Sept 2026",a:5000,aw:"Program + funding",fit:"★ Founders 18–30, equity-free. Exact profile.",l:"https://www.futurefounders.com/fellowship/"},
+{id:"thiel",n:"Thiel Fellowship",c:"Student",e:"Student",t:"Fellowship",nd:1,d:null,w:"Rolling (annual class)",a:200000,aw:"$200K over 2 yrs",fit:"Under 22, leave/skip college. (On board.)",l:"https://thielfellowship.org/"},
+{id:"contrary",n:"Contrary (Founder/Research)",c:"Student",e:"Student",t:"Fellowship",nd:1,d:null,w:"Cohorts Jun/Oct/Dec",a:0,aw:"Founder funding / stipend",fit:"Students & young founders nationwide.",l:"https://applications.contrary.com/"},
+{id:"envision",n:"Envision Accelerator",c:"Student",e:"BIPOC",t:"Accelerator",nd:1,s:1,d:null,w:"Cohort-based (open)",a:10000,aw:"~$10K + mentorship, equity-free",fit:"★ Young/diverse student founders. Needs MVP + diverse co-founder.",l:"https://www.envisionaccelerator.com/apply"},
+{id:"breakthrough",n:"Breakthrough Ventures",c:"Student",e:"Student",t:"Accelerator",nd:1,s:1,d:null,w:"Rolling (new 2026)",a:100000,aw:"up to $100K non-dilutive",fit:"★ For student founders, by student founders. Consumer focus.",l:"https://www.breakthroughvc.com"},
+{id:"nfte",n:"NFTE Youth Entrepreneurship Challenge",c:"Student",e:"Student",t:"Competition",nd:1,d:null,w:"Annual",a:10000,aw:"up to $10K; global $50K",fit:"Youth/student ventures, SDG briefs.",l:"https://nfte.com/"},
+
+// ===== YOUNG-FOUNDER MICROGRANTS / FELLOWSHIPS =====
+{id:"emergent",n:"Emergent Ventures (Mercatus)",c:"Student",e:"Open",t:"Grant",nd:1,s:1,d:null,w:"Rolling",a:50000,aw:"$10K–$100K",fit:"★ Zero-to-one ideas; frame as wellness/social impact.",l:"https://www.mercatus.org/emergent-ventures"},
+{id:"medici",n:"1517 Fund — Medici",c:"Student",e:"Student",t:"Grant",nd:1,d:null,w:"Rolling",a:1000,aw:"$1,000 no-strings",fit:"HS/college students & dropouts.",l:"https://www.1517fund.com/medici"},
+{id:"zfellows",n:"Z Fellows",c:"Student",e:"Student",t:"Fellowship",nd:1,d:null,w:"Rolling cohorts",a:10000,aw:"$10K",fit:"1-week intensive, young technical founders.",l:"https://www.zfellows.com/"},
+{id:"merge",n:"Merge Grant",c:"Student",e:"Student",t:"Grant",nd:1,d:null,w:"Rolling",a:1000,aw:"$100–$1,000",fit:"Young builders/students, no strings.",l:"https://merge.club/grant"},
+{id:"inflection",n:"Inflection Grants",c:"Student",e:"Student",t:"Grant",nd:1,d:null,w:"Rolling",a:2000,aw:"up to $2,000",fit:"People under 25 — idea or yourself.",l:"https://www.inflectiongrants.com/"},
+{id:"cactus",n:"Cactus Capital Microgrant",c:"Student",e:"Student",t:"Grant",nd:1,d:null,w:"Rolling",a:100,aw:"$100",fit:"By students, for students. Fast.",l:"https://merge.club/program/cactuscapital"},
+{id:"pioneer",n:"Pioneer",c:"Student",e:"Student",t:"Fellowship",nd:1,d:null,w:"Rolling",a:7000,aw:"~$7K + credits",fit:"Online tournament for young builders.",l:"https://pioneer.app/"},
+{id:"davis-peace",n:"Davis Projects for Peace",c:"Student",e:"Student",t:"Grant",nd:1,d:null,w:"Campus ~Jan",a:10000,aw:"$10K",fit:"Undergrads, grassroots community projects.",l:"https://www.davisprojectsforpeace.org/"},
+
+// ===== NORTHWESTERN (home campus — top fits) =====
+{id:"venturecat",n:"Northwestern VentureCat",c:"Student",e:"Single-school",t:"Competition",nd:1,s:1,d:null,w:"Opens Mar 2027",a:175000,aw:"$175K–$325K pool",fit:"★ Your school. Already on the board.",l:"https://www.venturecat.northwestern.edu/"},
+{id:"garage-jump",n:"The Garage Jumpstart Pre-Accelerator",c:"Student",e:"Single-school",t:"Accelerator",nd:1,s:1,d:null,w:"Annual summer",a:10000,aw:"$10K/team + $10K pool",fit:"★ All Northwestern students.",l:"https://www.thegarage.northwestern.edu/programs"},
+{id:"garage-mfg",n:"Garage Manufacturing Fund",c:"Student",e:"Single-school",t:"Grant",nd:1,s:1,d:null,w:"Open (launched Jan 2026)",a:25000,aw:"up to $25K",fit:"★ NU hardware/physical-product — fits Bemellou.",l:"https://www.thegarage.northwestern.edu/resources/funding"},
+{id:"garage-opp",n:"Garage Opportunity Fund",c:"Student",e:"Single-school",t:"Grant",nd:1,d:null,w:"Rolling",a:1000,aw:"microgrants",fit:"SES-eligible NU founders.",l:"https://www.thegarage.northwestern.edu/programs/opportunityfund"},
+
+// ===== GENERAL / NATIONAL PITCH COMPETITIONS =====
+{id:"skip-summer",n:"Skip $10K Summer Grant",c:"General",e:"Open",t:"Grant",nd:1,s:1,d:"2026-06-30",w:"Jun 30, 2026",a:10000,aw:"$10K cash",fit:"★ Cleanest fit — sector-agnostic, no gates.",l:"https://helloskip.com/funding-details/10k-summer-grant"},
+{id:"phl-swc",n:"Philadelphia Startup World Cup",c:"General",e:"Open",t:"Competition",nd:1,d:"2026-07-15",w:"Jul 15, 2026",a:20000,aw:"$20K + $1M path",fit:"Regional → global. Registered entity; in-person Sept 18.",l:"https://www.startupworldcup.io/philadelphia-app-2026"},
+{id:"swc",n:"Startup World Cup (regionals)",c:"General",e:"Open",t:"Competition",nd:1,d:null,w:"Rolling regionals",a:1000000,aw:"$1M finale",fit:"Many city qualifiers → SF finale.",l:"https://www.startupworldcup.io/applynow"},
+{id:"deel-pitch",n:"The Pitch by Deel",c:"General",e:"Open",t:"Competition",nd:1,d:null,w:"2027 waitlist open",a:1000000,aw:"$50K–$1M SAFE",fit:"Regional → global tournament.",l:"https://www.deel.com/the-pitch-by-deel/"},
+{id:"open-pitch",n:"Open Pitch (Invest Fest)",c:"General",e:"Open",t:"Competition",nd:1,d:null,w:"Aug 7–9, 2026 (Atlanta)",a:125000,aw:"$125K investment",fit:"Early-stage, any sector.",l:"https://www.theopenpitch.com/"},
+{id:"verizon-pitch",n:"Verizon Super Pitch",c:"General",e:"Open",t:"Competition",nd:1,d:null,w:"2026 (FIFA tie-in)",a:20000,aw:"$20K + trips",fit:"US small businesses, any sector.",l:"https://www.verizon.com/about/news/verizon-small-business-super-pitch-competition-carli-lloyd"},
+{id:"codelaunch",n:"CodeLaunch USA",c:"General",e:"Open",t:"Competition",nd:1,d:null,w:"World Champ Nov 11",a:50000,aw:"$50K+",fit:"US-based founders, any sector.",l:"https://codelaunch.com/events/2026-usa-ga/"},
+{id:"sxsw",n:"SXSW Pitch",c:"General",e:"Open",t:"Competition",nd:1,d:null,w:"Mar 2026 (paid app)",a:0,aw:"Cash + exposure",fit:"Emerging companies, multiple tracks.",l:"https://sxsw.com/pitch/"},
+{id:"meetdrapers",n:"Meet the Drapers",c:"General",e:"Open",t:"Competition",nd:1,d:null,w:"Auditions ongoing",a:1000000,aw:"up to $1M",fit:"TV/online crowdfunding pitch show.",l:"https://draperuniversity.com/pitch"},
+{id:"43north",n:"43North",c:"General",e:"Region",t:"Competition",nd:1,d:null,w:"2026 is FINAL cohort",a:1000000,aw:"5 × $1M",fit:"Relocate to Buffalo for a year.",l:"https://43north.org/"},
+{id:"ewc",n:"Entrepreneurship World Cup",c:"General",e:"Open",t:"Competition",nd:1,d:null,w:"Through ~May (annual)",a:1000000,aw:"up to $1M equity-free",fit:"Global, all stages incl. idea.",l:"https://www.entrepreneurshipworldcup.com"},
+{id:"slush",n:"Slush 100",c:"General",e:"Open",t:"Competition",nd:1,d:null,w:"Ahead of Nov 2026",a:1000000,aw:"€1M",fit:"Early-stage global (Helsinki).",l:"https://slush.org/"},
+{id:"websummit",n:"Web Summit PITCH",c:"General",e:"Open",t:"Competition",nd:1,d:null,w:"Nov 2026 (Lisbon)",a:0,aw:"Exposure + prizes",fit:"Early-stage, any sector.",l:"https://websummit.com/startups/pitch/"},
+{id:"battlefield",n:"TechCrunch Startup Battlefield",c:"General",e:"Open",t:"Competition",nd:1,d:null,w:"Annual (Disrupt)",a:100000,aw:"$100K equity-free",fit:"Early-stage, any industry. Free to enter.",l:"https://techcrunch.com/startup-battlefield/"},
+
+// ===== RECURRING / CORPORATE / FOUNDATION GRANTS =====
+{id:"amber",n:"Amber Grant (WomensNet)",c:"General",e:"Women",t:"Grant",nd:1,d:"2026-06-30",w:"Jun 30 cutoff (monthly)",a:10000,aw:"$10K/mo + $50K year-end",fit:"51%+ women-owned. Wellness & startup categories.",l:"https://ambergrantsforwomen.com/get-an-amber-grant/"},
+{id:"galaxy",n:"Galaxy Grant (Hidden Star)",c:"General",e:"Women",t:"Grant",nd:1,d:"2026-07-31",w:"Jul 31, 2026",a:4250,aw:"$4,250",fit:"Women & minority owners. Free, 30-sec app.",l:"https://galaxyofstars.org/galaxy-grants/"},
+{id:"hey-helen",n:"Hey Helen Grant (Visionaries)",c:"General",e:"Women",t:"Grant",nd:1,d:"2026-08-30",w:"Aug 30, 2026",a:10000,aw:"$10K",fit:"Mission-driven women founders.",l:"https://visionaries.co/helen-grant/"},
+{id:"starther",n:"TWU StartHER Grant",c:"General",e:"Women",t:"Grant",nd:1,d:"2026-09-23",w:"Sep 1–23, 2026",a:5000,aw:"Cash grant",fit:"Texas women-owned.",l:"https://www.tailorbrands.com/start-a-business/texas/grants"},
+{id:"verizon-dr",n:"Verizon Small Business Digital Ready",c:"General",e:"Open",t:"Grant",nd:1,s:1,d:null,w:"Monthly Jun–Dec 2026",a:10000,aw:"$10K",fit:"★ Complete 2 courses to qualify. Recurring, easy.",l:"https://www.lisc.org/our-initiatives/small-business/our-work/verizon-small-business-digital-ready/grant-program/"},
+{id:"skip-instant",n:"Skip Instant Grants",c:"General",e:"Open",t:"Grant",nd:1,d:null,w:"Twice weekly",a:5000,aw:"$500–$10K",fit:"Fast turnaround microgrants.",l:"https://helloskip.com/grants"},
+{id:"helloalice",n:"Hello Alice Grants",c:"General",e:"Open",t:"Grant",nd:1,d:null,w:"Rolling feed",a:15000,aw:"$5K–$25K",fit:"Recurring sponsor grants year-round.",l:"https://helloalice.com/funding/grants/"},
+{id:"freed",n:"Freed Fellowship",c:"General",e:"Open",t:"Grant",nd:1,d:null,w:"Monthly",a:500,aw:"$500/mo + $2.5K",fit:"Feedback on every submission. $19 fee.",l:"https://freedfellowship.com/"},
+{id:"awesome",n:"Awesome Foundation",c:"General",e:"Open",t:"Grant",nd:1,d:null,w:"Monthly",a:1000,aw:"$1,000 no-strings",fit:"Any community/wellbeing project.",l:"https://www.awesomefoundation.org/"},
+{id:"pollination",n:"The Pollination Project",c:"General",e:"Open",t:"Grant",nd:1,d:null,w:"Rolling (daily)",a:1000,aw:"up to $1,000",fit:"Social-impact; campus mental-wellness framing.",l:"https://thepollinationproject.org/apply/"},
+{id:"nase",n:"NASE Growth Grant",c:"General",e:"Open",t:"Grant",nd:1,d:null,w:"Quarterly (membership)",a:4000,aw:"up to $4,000",fit:"Requires NASE membership.",l:"https://www.nase.org/become-a-member/grants-and-scholarships/growth-grants"},
+{id:"comcast-rise",n:"Comcast RISE",c:"General",e:"BIPOC",t:"Grant",nd:1,d:null,w:"Periodic windows",a:5000,aw:"$5K + services",fit:"POC-owned small biz.",l:"https://www.comcastrise.com/"},
+{id:"fedex",n:"FedEx Small Business Grant",c:"General",e:"Open",t:"Grant",nd:1,d:null,w:"~Feb–Mar (annual)",a:30000,aw:"$15K–$50K",fit:"Needs FedEx shipping account 6+ mo.",l:"https://www.fedex.com/en-us/small-business/grants.html"},
+{id:"cartier",n:"Cartier Women's Initiative",c:"General",e:"Women",t:"Grant",nd:1,d:null,w:"~Apr–Jun (annual)",a:100000,aw:"up to $100K",fit:"Women-led impact for-profit, $50K–$5M rev.",l:"https://www.cartierwomensinitiative.com/"},
+{id:"toryburch",n:"Tory Burch Foundation Fellows",c:"General",e:"Women",t:"Fellowship",nd:1,d:null,w:"Apps Sept–Nov",a:5000,aw:"$5K + program",fit:"Women-owned US, $75K+ rev.",l:"https://www.toryburchfoundation.org/fellows/"},
+{id:"eileenfisher",n:"Eileen Fisher Women-Owned Grant",c:"General",e:"Women",t:"Grant",nd:1,d:null,w:"~Apr (annual)",a:100000,aw:"up to $200K (split)",fit:"Women-owned, 3+ yrs, mission/sustainability.",l:"https://www.eileenfisher.com/grant-programs"},
+{id:"visa-shesnext",n:"Visa She's Next (IFundWomen)",c:"General",e:"Women",t:"Grant",nd:1,d:null,w:"Periodic rounds",a:10000,aw:"~$10K + coaching",fit:"US women small-business owners.",l:"https://www.ifundwomen.com/visa"},
+{id:"att-shes",n:"AT&T She's Connected",c:"General",e:"Women",t:"Grant",nd:1,d:null,w:"Apps ~May 1",a:50000,aw:"$50K grand",fit:"Women small-business owners.",l:"https://about.att.com/"},
+{id:"sogal",n:"SoGal Black Founder Grant",c:"General",e:"BIPOC",t:"Grant",nd:1,d:null,w:"Rolling monthly",a:10000,aw:"$5K–$10K",fit:"Black woman/nonbinary founders.",l:"https://www.sogalfoundation.org/black-founder-startup-grant"},
+{id:"herrise",n:"HerRise MicroGrant",c:"General",e:"Women",t:"Grant",nd:1,d:null,w:"Monthly",a:1000,aw:"$1,000",fit:"Under-resourced women, <$1M rev. $15 fee.",l:"https://www.hersuitespot.com/herrise/"},
+{id:"ifw-universal",n:"IFundWomen Universal Grant",c:"General",e:"Women",t:"Grant",nd:1,d:null,w:"Rolling",a:15000,aw:"$5K–$25K",fit:"One app auto-matches partner grants.",l:"https://www.ifundwomen.com/grants/universal-grant-application-0"},
+{id:"clif",n:"Clif Family Foundation",c:"General",e:"Open",t:"Grant",nd:1,d:null,w:"Two cycles/yr",a:8000,aw:"~$8,000",fit:"Food, environment, community health.",l:"https://cliffamilyfoundation.org/Grants-Program"},
+{id:"usda-vapg",n:"USDA Value-Added Producer Grant",c:"General",e:"Open",t:"Grant",nd:1,d:null,w:"~Feb–Apr (annual)",a:50000,aw:"up to $50K planning",fit:"Ag producers adding value (food).",l:"https://www.rd.usda.gov/programs-services/business-programs/value-added-producer-grants"},
+
+// ===== ACCELERATORS (non-dilutive + equity, tagged) =====
+{id:"gbeta",n:"gBETA (gener8tor)",c:"General",e:"Open",t:"Accelerator",nd:1,s:1,d:null,w:"Rolling by city",a:0,aw:"Free, no equity",fit:"★ Great low-risk fit. Many US cities incl. Chicago.",l:"https://www.gener8tor.com/gbeta"},
+{id:"masschallenge",n:"MassChallenge",c:"General",e:"Open",t:"Accelerator",nd:1,s:1,d:null,w:"Annual (apps ~spring)",a:100000,aw:"$0 equity + cash prizes",fit:"★ Sector-agnostic incl. consumer health; zero-equity.",l:"https://masschallenge.org/programs-all/"},
+{id:"plugplay",n:"Plug and Play",c:"General",e:"Open",t:"Accelerator",nd:1,d:null,w:"Rolling year-round",a:0,aw:"Equity-free core",fit:"Health + Consumer/Retail verticals.",l:"https://www.plugandplaytechcenter.com/insights/how-to-apply"},
+{id:"seedspot",n:"SEED SPOT Impact Accelerator",c:"General",e:"Open",t:"Accelerator",nd:1,d:null,w:"Rolling — remote-friendly",a:0,aw:"Equity-free + demo day",fit:"Diverse founders; impact/wellness+community fit.",l:"https://seedspot.org/impact-accelerator/"},
+{id:"fi",n:"Founder Institute",c:"General",e:"Open",t:"Accelerator",nd:1,d:null,w:"Rolling by city",a:0,aw:"Fee + 2.5% warrant",fit:"Idea-stage OK. Good for undergrad founders.",l:"https://fi.co/admissions"},
+{id:"halcyon",n:"Halcyon Incubator",c:"Impact",e:"Open",t:"Incubator",nd:1,d:null,w:"Check next cohort",a:25000,aw:"$25K+ + DC residency, equity-free",fit:"Early founders w/ MVP, measurable impact.",l:"https://halcyonhouse.org/incubator"},
+{id:"mit-deltav",n:"MIT delta v",c:"Student",e:"Single-school",t:"Accelerator",nd:1,d:null,w:"Summer 2026",a:0,aw:"Stipend; equity-free",fit:"MIT-affiliated student founders.",l:"https://entrepreneurship.mit.edu/accelerator/program/"},
+{id:"startx",n:"Stanford StartX",c:"Student",e:"Single-school",t:"Accelerator",nd:1,d:null,w:"Rolling",a:0,aw:"Equity-free",fit:"Stanford-affiliated founders.",l:"https://startx.com/"},
+// equity accelerators (nd:0)
+{id:"yc",n:"Y Combinator — Fall 2026",c:"General",e:"Open",t:"Accelerator",nd:0,d:"2026-07-27",w:"Jul 27, 2026",a:500000,aw:"$500K for ~7%",fit:"Early Decision track for students. Takes equity.",l:"https://www.ycombinator.com/apply"},
+{id:"techstars",n:"Techstars",c:"General",e:"Open",t:"Accelerator",nd:0,d:null,w:"Rolling (quarterly)",a:220000,aw:"$220K for ~5%",fit:"Consumer accepted in some programs (LA/NYC/Anywhere).",l:"https://apply.techstars.com"},
+{id:"speedrun",n:"a16z Speedrun",c:"General",e:"Open",t:"Accelerator",nd:0,d:null,w:"SR007 Jul 27–Oct 2026",a:750000,aw:"up to ~$750K for ~7%",fit:"Consumer apps + community thesis fit. Takes equity.",l:"https://speedrun.a16z.com/apply"},
+{id:"antler",n:"Antler",c:"General",e:"Open",t:"Accelerator",nd:0,d:null,w:"Rolling residency",a:250000,aw:"~$250K for ~9%",fit:"Day-zero/pre-seed. Takes equity.",l:"https://www.antler.co/"},
+{id:"mucker",n:"MuckerLab",c:"General",e:"Open",t:"Accelerator",nd:0,d:null,w:"Rolling",a:175000,aw:"$100K–$175K / ~10–15%",fit:"LA pre-seed–Series A.",l:"https://mucker.com/accelerator/"},
+{id:"sku",n:"SKU",c:"Consumer/CPG",e:"Open",t:"Accelerator",nd:0,d:null,w:"Spring 2026 open",a:0,aw:"Equity for services",fit:"Leading CPG accelerator; needs ~$100K+ revenue.",l:"https://sku.is/"},
+{id:"xrc",n:"XRC Ventures",c:"Consumer/CPG",e:"Open",t:"Accelerator",nd:0,d:null,w:"~2×/yr",a:135000,aw:"~$135K for equity",fit:"NYC pre-seed consumer/retail/wellness.",l:"https://xrcventures.com/apply"},
+{id:"capfactory",n:"Capital Factory",c:"Regional",e:"Region",t:"Accelerator",nd:0,d:null,w:"Rolling",a:100000,aw:"~$100K for 1%",fit:"Austin early-stage, all sectors.",l:"https://capitalfactory.com/"},
+{id:"boomtown",n:"Boomtown Accelerators",c:"Regional",e:"Region",t:"Accelerator",nd:0,d:null,w:"Rolling (2×/yr)",a:35000,aw:"$20K–$35K + perks",fit:"Boulder; health/hardware.",l:"https://www.boomtownaccelerators.com/"},
+
+// ===== DESIGN / INVENTION AWARDS (non-dilutive) =====
+{id:"dyson",n:"James Dyson Award (US)",c:"Design",e:"Student",t:"Award",nd:1,d:"2026-07-15",w:"~mid-Jul 2026",a:6500,aw:"~$6.5K US / ~$40K global",fit:"Enter via the physical product. Lead studies design/eng.",l:"https://www.jamesdysonaward.org/en-US/"},
+{id:"if-design",n:"iF Design Award 2027",c:"Design",e:"Open",t:"Award",nd:1,d:"2026-11-04",w:"Nov 4, 2026",a:0,aw:"iF seal",fit:"Any market-ready consumer product.",l:"https://ifdesign.com/en/if-design-award-and-jury"},
+{id:"collegiate-inv",n:"Collegiate Inventors Competition",c:"Design",e:"Student",t:"Competition",nd:1,d:null,w:"Annual ~Jun 1",a:10000,aw:"up to $10K + patent",fit:"US college students w/ invention/prototype.",l:"https://www.invent.org/collegiate-inventors"},
+{id:"red-dot",n:"Red Dot Award: Product Design",c:"Design",e:"Open",t:"Award",nd:1,d:null,w:"Entries ~Jan–Mar",a:0,aw:"Red Dot seal",fit:"Market-ready product, 52 categories.",l:"https://www.red-dot.org/pd"},
+{id:"core77",n:"Core77 Design Awards",c:"Design",e:"Open",t:"Award",nd:1,d:null,w:"Entries ~Jan–Mar",a:0,aw:"Trophy + feature",fit:"Product/packaging + student categories.",l:"https://designawards.core77.com/"},
+{id:"idsa-idea",n:"IDEA (IDSA)",c:"Design",e:"Open",t:"Award",nd:1,d:null,w:"Round 2 ~Apr–May",a:0,aw:"IDEA medal",fit:"Has collegiate/student category.",l:"https://www.idsa.org/awards-recognitions/idea/"},
+{id:"ces-innov",n:"CES Innovation Awards 2027",c:"Design",e:"Open",t:"Award",nd:1,d:null,w:"Submissions ~summer–fall",a:0,aw:"Award + CES showcase",fit:"Consumer tech new to market — hardware + app.",l:"https://www.ces.tech/ces-innovation-awards/innovation-awards/"},
+{id:"edison",n:"Edison Awards 2027",c:"Design",e:"Open",t:"Award",nd:1,d:null,w:"Nominations ~summer",a:0,aw:"Edison medal",fit:"Recently launched consumer products.",l:"https://edisonawards.com/nominations/"},
+{id:"fastco",n:"Fast Company Innovation by Design",c:"Design",e:"Open",t:"Award",nd:1,d:null,w:"Opens ~early 2027",a:0,aw:"Editorial feature",fit:"31 categories incl. products, packaging.",l:"https://www.fastcompany.com/apply/innovation-by-design"},
+{id:"dieline",n:"DIELINE Awards",c:"Design",e:"Open",t:"Award",nd:1,d:null,w:"Rolling windows",a:0,aw:"Trophy + feature",fit:"Consumer packaging & CPG design.",l:"https://www.dielineawards.com/about"},
+
+// ===== SOCIAL IMPACT =====
+{id:"venturewell",n:"VentureWell E-Team",c:"Impact",e:"Student",t:"Grant",nd:1,d:"2026-09-29",w:"Opens Jul 27; due Sep 29",a:25000,aw:"up to $25K non-dilutive",fit:"US student team + faculty advisor; invention/impact.",l:"https://venturewell.org/e-team-program/"},
+{id:"echoing-green",n:"Echoing Green Fellowship",c:"Impact",e:"Open",t:"Fellowship",nd:1,d:null,w:"Reopens fall 2026",a:100000,aw:"$100K stipend",fit:"Early-stage social entrepreneurs.",l:"https://echoinggreen.org/fellowship/"},
+{id:"fowler",n:"Fowler Global Social Innovation Challenge",c:"Impact",e:"Student",t:"Competition",nd:1,d:null,w:"Annual",a:100000,aw:"$100K share",fit:"Student social entrepreneurs. (On board.)",l:"https://www.fowlergsic.com/"},
+{id:"earthprize",n:"The Earth Prize",c:"Impact",e:"Student",t:"Competition",nd:1,d:null,w:"Submit by ~Feb 28",a:100000,aw:"$100K",fit:"Teen students, environmental sustainability.",l:"https://www.theearthprize.org/competition"},
+{id:"millennium",n:"Millennium Fellowship",c:"Impact",e:"Student",t:"Fellowship",nd:1,d:null,w:"Apps open",a:0,aw:"Free program + cert",fit:"Undergrads advancing SDGs on campus.",l:"https://www.millenniumfellows.org/"},
+{id:"tmobile-cm",n:"T-Mobile Changemaker Challenge",c:"Impact",e:"Student",t:"Grant",nd:1,d:null,w:"Annual",a:15000,aw:"up to $15K",fit:"Youth 13–18 community-impact projects.",l:"https://www.t-mobile.com/responsibility/community/education/changemaker-challenge"},
+{id:"climatelaunchpad",n:"ClimateLaunchpad",c:"Impact",e:"Open",t:"Competition",nd:1,d:null,w:"2026 open call",a:0,aw:"Bootcamp + prizes",fit:"Sustainability ventures <2 yrs.",l:"https://www.climate-kic.org/open-call/start-ups-applications-for-climatelaunchpad-2026/"},
+
+// ===== REGIONAL (Chicago/Midwest first) =====
+{id:"techrise",n:"TechRise by P33",c:"Regional",e:"BIPOC",t:"Competition",nd:1,d:null,w:"Weekly Apr–Nov 2026",a:50000,aw:"$25K–$50K weekly; $100K grand",fit:"Chicagoland underrepresented founders. (On board.)",l:"https://www.techrise.co/"},
+{id:"mhub",n:"mHUB HardTech (Compute-Energy)",c:"Regional",e:"Region",t:"Accelerator",nd:0,d:"2026-07-13",w:"Jul 13, 2026",a:200000,aw:"$200K pkg for 6.5%",fit:"Chicago physical-product/hardtech. (Equity.)",l:"https://mhub.org/accelerator"},
+{id:"hatchery",n:"The Hatchery Chicago",c:"Regional",e:"Region",t:"Incubator",nd:1,d:null,w:"Rolling",a:20000,aw:"$20K grants + space",fit:"Chicago food/CPG incubator.",l:"https://thehatcherychicago.org/"},
+{id:"matter",n:"MATTER",c:"Regional",e:"Region",t:"Incubator",nd:1,d:null,w:"Rolling + cohorts",a:0,aw:"Membership + mentorship",fit:"Chicago health-tech incubator.",l:"https://matter.health/"},
+{id:"il-invent",n:"Illinois INVENT",c:"Regional",e:"Region",t:"Grant",nd:1,d:null,w:"Rolling",a:10000,aw:"$10K–$6M",fit:"IL-HQ businesses.",l:"https://dceo.illinois.gov/illinoisinvent.html"},
+{id:"il-voucher",n:"Illinois Innovation Voucher",c:"Regional",e:"Region",t:"Grant",nd:1,d:null,w:"Rolling",a:75000,aw:"up to $75K",fit:"IL biz + IL university partner.",l:"https://dceo.illinois.gov/whyillinois/innovation-vouchers.html"},
+{id:"arch",n:"Arch Grants (St. Louis)",c:"Regional",e:"Region",t:"Grant",nd:1,d:null,w:"Reopens ~Feb 2027",a:75000,aw:"$75K equity-free",fit:"Relocate to St. Louis.",l:"https://archgrants.org/programs/startup-competition/"},
+{id:"mn-cup",n:"MN Cup",c:"Regional",e:"Region",t:"Competition",nd:1,d:null,w:"Reopens ~Mar 2027",a:400000,aw:"$400K+ share",fit:"MN biz <$1M rev (Student division).",l:"https://carlsonschool.umn.edu/mn-cup"},
+{id:"launchmn",n:"Launch Minnesota Innovation Grants",c:"Regional",e:"Region",t:"Grant",nd:1,d:null,w:"Rolling/quarterly",a:35000,aw:"up to $35K",fit:"MN tech/innovation.",l:"https://mn.gov/deed/launchmngrant/"},
+{id:"launchkc",n:"LaunchKC Grants",c:"Regional",e:"Region",t:"Grant",nd:1,d:null,w:"Apps ~Aug–Sep 2026",a:60000,aw:"$60K non-dilutive",fit:"KC MO HQ or relocate.",l:"https://www.launchkc.org/competition/"},
+{id:"calosba",n:"CalOSBA Innovation Grant",c:"Regional",e:"Region",t:"Grant",nd:1,d:null,w:"Annual (awarded Mar)",a:100000,aw:"$25K–$100K",fit:"CA biz, pre-rev OK, health-tech.",l:"https://calosba.ca.gov/funding-grants-incentives/accelerate-california/"},
+{id:"co-ai",n:"CO Advanced Industries Early-Stage",c:"Regional",e:"Region",t:"Grant",nd:1,d:"2026-08-27",w:"Aug 27, 2026",a:250000,aw:"up to $250K",fit:"Colorado-based advanced industries.",l:"https://oedit.colorado.gov/advanced-industries-early-stage-capital-retention-grant"},
+{id:"co-startupweek",n:"Colorado Startup Week Pitch",c:"Regional",e:"Region",t:"Competition",nd:1,d:null,w:"Sep 14–18, 2026",a:0,aw:"Cash + investors",fit:"Statewide CO.",l:"https://www.costartupweek.com/"},
+{id:"az-aic",n:"Arizona Innovation Challenge",c:"Regional",e:"Region",t:"Grant",nd:1,d:null,w:"~Jun 1–Jul 15 (verify)",a:250000,aw:"up to $250K",fit:"AZ, 2–30 employees.",l:"https://www.azcommerce.com/start-up/arizona-innovation-challenge/"},
+{id:"asu-io",n:"ASU Innovation Open",c:"Regional",e:"Student",t:"Competition",nd:1,d:null,w:"Watch fall 2026",a:400000,aw:"up to $400K",fit:"Open to any college team; hard-tech skew.",l:"https://asu.io/"},
+{id:"venture-atl",n:"Venture Atlanta Startup Showcase",c:"Regional",e:"Region",t:"Competition",nd:1,d:null,w:"Apps close ~Aug 2026",a:375000,aw:"$375K investment",fit:"Southeast pre-seed/seed.",l:"https://www.ventureatlanta.org/pitch/"},
+{id:"ncidea",n:"NC IDEA SEED",c:"Regional",e:"Region",t:"Grant",nd:1,d:null,w:"Twice yearly (~Feb)",a:50000,aw:"up to $50K non-dilutive",fit:"North Carolina startups.",l:"https://ncidea.org/nc-idea-seed/"},
+{id:"vipc",n:"VIPC Launch Program",c:"Regional",e:"Region",t:"Grant",nd:1,d:null,w:"Quarterly",a:50000,aw:"grants up to $50K",fit:"Virginia pre-MVP startups.",l:"https://vipc.org/funding/startups/"},
+{id:"emerge",n:"eMerge Americas Accelerator",c:"Regional",e:"Region",t:"Competition",nd:1,d:null,w:"Apply 2027 cohort",a:100000,aw:"$100K + program",fit:"Miami; 100 startups, global.",l:"https://emergeamericas.com/startups/startup-showcase-accelerator/"},
+{id:"skydeck",n:"Berkeley SkyDeck",c:"Regional",e:"Region",t:"Accelerator",nd:0,d:null,w:"Apps open Jul 2026",a:200000,aw:"$200K cohort (equity)",fit:"Bay Area; you have a Berkeley pilot tie.",l:"https://skydeck.berkeley.edu/apply/"},
+
+// ===== BIPOC NOTABLE =====
+{id:"santander",n:"Santander Cultivate Small Biz",c:"Consumer/CPG",e:"BIPOC",t:"Accelerator",nd:1,d:"2026-07-22",w:"~Jul 22, 2026",a:20000,aw:"up to $20K",fit:"Underserved/diverse; food-focused (may need revenue).",l:"https://www.santanderbank.com/business/build/cultivate-small-business"},
+{id:"google-black",n:"Google Black Founders Fund",c:"General",e:"BIPOC",t:"Grant",nd:1,d:null,w:"Check 2026 window",a:50000,aw:"Equity-free cash",fit:"Black-led US startups.",l:"https://startup.google.com/programs/black-founders-fund/united-states/"},
+{id:"google-latino",n:"Google Latino Founders Fund",c:"General",e:"BIPOC",t:"Grant",nd:1,d:null,w:"Watch 2026",a:50000,aw:"Equity-free cash",fit:"Latino-led US startups.",l:"https://startup.google.com/programs/latino-founders-fund/"},
+{id:"camelback",n:"Camelback Ventures Fellowship",c:"General",e:"BIPOC",t:"Fellowship",nd:1,d:null,w:"Annual cohort",a:40000,aw:"Capital + coaching",fit:"Underrepresented early-stage founders.",l:"https://www.camelbackventures.org/"},
+{id:"dream-makers",n:"Dream Makers Founder Grant (15% Pledge)",c:"Consumer/CPG",e:"BIPOC",t:"Grant",nd:1,d:null,w:"Quarterly 2026",a:50000,aw:"$25K–$50K",fit:"BIPOC women CPG founders (health/beauty/wellness).",l:"https://nancytwine.com/thegrant/"},
+{id:"blackambition",n:"Black Ambition Prize",c:"General",e:"BIPOC",t:"Competition",nd:1,d:null,w:"~Feb–May 2027",a:1000000,aw:"$15K–$1M",fit:"Black/Hispanic founders. Consumer eligible.",l:"https://blackambitionprize.com/apply-now/"},
+{id:"better-futures",n:"Better Futures Pitch (HBCU FI)",c:"General",e:"BIPOC",t:"Competition",nd:1,d:null,w:"National",a:0,aw:"Funding",fit:"HBCU students/alumni.",l:"https://www.hbcufi.org/pitch-competition"},
+
+// ===== WOMEN NOTABLE (non-dilutive only) =====
+{id:"wfn",n:"Women Founders Network Fast Pitch",c:"General",e:"Women",t:"Competition",nd:1,d:null,w:"Apps Apr 1–May 31",a:25000,aw:"$25K/track + services",fit:"US women-led; dedicated CPG/Consumer track.",l:"https://www.womenfoundersnetwork.org/about-fast-pitch"},
+{id:"sephora-acc",n:"Sephora Accelerate",c:"Consumer/CPG",e:"Women",t:"Accelerator",nd:1,d:null,w:"Reopens ~Mar 2027",a:25000,aw:"Grant + retail path",fit:"Prestige beauty/wellness; underrepresented founders.",l:"https://accelerate.sephora.com/"},
+{id:"google-women",n:"Google for Startups: Women Founders",c:"General",e:"Women",t:"Accelerator",nd:1,d:null,w:"Annual cohort",a:0,aw:"Equity-free + $350K credits",fit:"US/Canada women-led, Seed–Series A.",l:"https://startup.google.com/programs/accelerator/women-founders/north-america/"},
+{id:"ladieswholaunch",n:"Ladies Who Launch (Sam's Club)",c:"General",e:"Women",t:"Grant",nd:1,d:null,w:"Reopens ~Feb 2027",a:10000,aw:"$10K grant + training",fit:"Women founders, growth for good.",l:"https://www.ladieswholaunch.org/launchprogram"},
+{id:"innovateher",n:"InnovateHER Challenge (SBA)",c:"General",e:"Women",t:"Competition",nd:1,d:null,w:"~Aug–Dec",a:40000,aw:"$40K/$20K/$10K",fit:"Products impacting women & families.",l:"https://www.sba.gov/innovateher"},
+{id:"tiewomen",n:"TiE Women Global Pitch",c:"General",e:"Women",t:"Competition",nd:1,d:null,w:"~Jun (annual)",a:50000,aw:"$50K grant + mentorship",fit:"Female-founded/co-founded (33%+ equity), <7 yrs.",l:"https://www.tiewomen.org/"},
+{id:"femtechlab",n:"FemTech Lab Accelerator",c:"Wellness",e:"Women",t:"Accelerator",nd:0,d:null,w:"2 cohorts/yr",a:0,aw:"Program (5% equity)",fit:"Women's health/wellness; pre-seed OK.",l:"https://femtechlab.com/"}
+];
+
+// ---- state (local cache + optional Supabase team sync) ----
+const LSKEY="bemellouPipelineV2";
+const SUPA_URL="%%SUPABASE_URL%%";      // injected on publish
+const SUPA_KEY="%%SUPABASE_ANON_KEY%%"; // anon key — safe to be public (protected by table policy)
+let state=JSON.parse(localStorage.getItem(LSKEY)||"{}");
+let cloud=null, USER=localStorage.getItem("pipelineUser")||"", noteTimers={};
+function saveLocal(){localStorage.setItem(LSKEY,JSON.stringify(state))}
+const save=saveLocal; // back-compat
+function get(id){return state[id]||(state[id]={status:"Backlog",notes:""})}
+function commit(id){const g=get(id);g.updated_by=USER;saveLocal();
+  if(cloud){cloud.from('pipeline_state').upsert({id,status:g.status,notes:g.notes,updated_by:USER,updated_at:new Date().toISOString()}).then(({error})=>{if(error)console.warn('sync',error)});}}
+function commitDebounced(id){saveLocal();clearTimeout(noteTimers[id]);noteTimers[id]=setTimeout(()=>commit(id),700);}
+function setConn(cls,txt){const el=document.getElementById("conn");if(el){el.className="conn "+cls;el.textContent=txt;}}
+function updateWho(){const w=document.getElementById("who");if(!w)return;
+  w.innerHTML=USER?`You: <b>${USER}</b> · <a href="#" id="chgUser">change</a>`:`<a href="#" id="chgUser">set your name</a>`;
+  const c=document.getElementById("chgUser");if(c)c.onclick=ev=>{ev.preventDefault();const n=prompt("Your name (so teammates see who updates what):",USER);if(n!==null&&n.trim()){USER=n.trim();localStorage.setItem("pipelineUser",USER);updateWho();}};}
+async function initCloud(){
+  if(!SUPA_URL.startsWith("http")||typeof supabase==="undefined"){setConn("local","● Local only — not yet connected to team");return;}
+  try{
+    cloud=supabase.createClient(SUPA_URL,SUPA_KEY);
+    const {data,error}=await cloud.from('pipeline_state').select('*');
+    if(error)throw error;
+    (data||[]).forEach(r=>{state[r.id]={status:r.status||"Backlog",notes:r.notes||"",updated_by:r.updated_by||""};});
+    saveLocal();
+    cloud.channel('pipeline-rt').on('postgres_changes',{event:'*',schema:'public',table:'pipeline_state'},p=>{
+      const r=p.new;if(r&&r.id){state[r.id]={status:r.status||"Backlog",notes:r.notes||"",updated_by:r.updated_by||""};saveLocal();render();}}).subscribe();
+    setConn("live","● Live · synced with team");
+    if(!USER){const n=prompt("Welcome! Your name (so teammates see who updates what):","");if(n&&n.trim()){USER=n.trim();localStorage.setItem("pipelineUser",USER);}}
+    updateWho();render();
+  }catch(e){console.warn(e);setConn("err","● Offline — couldn't reach team database");}
+}
+let filters={search:"",cat:"",type:"",elig:"",status:"",sort:"deadline",chip:"all"};
+let boardMode=false;
+
+function dInfo(it){
+  if(!it.d){
+    const roll=/rolling|monthly|weekly|daily|ongoing/i.test(it.w||"");
+    return {cls:"b-roll",label:it.w||"—",days:99999,key:roll?900000:950000};
+  }
+  const today=new Date();today.setHours(0,0,0,0);
+  const dt=new Date(it.d+"T00:00:00");
+  const days=Math.round((dt-today)/86400000);
+  let cls="b-ok"; if(days<0)cls="b-past"; else if(days<=7)cls="b-urgent"; else if(days<=30)cls="b-soon";
+  const lbl=days<0?("Passed · "+it.w):(it.w+" · "+(days===0?"today!":days+"d"));
+  return {cls,label:lbl,days,key:days>=0?days:(990000+days)};
+}
+function matches(it){
+  const g=get(it.id);
+  if(filters.cat&&it.c!==filters.cat)return false;
+  if(filters.type&&it.t!==filters.type)return false;
+  if(filters.elig&&it.e!==filters.elig)return false;
+  if(filters.status&&g.status!==filters.status)return false;
+  if(filters.chip==="star"&&!it.s)return false;
+  if(filters.chip==="nd"&&!it.nd)return false;
+  if(filters.chip==="urgent"){const di=dInfo(it);if(di.days>14||di.days<0)return false;}
+  if(filters.chip==="open"&&it.e!=="Open")return false;
+  if(filters.chip==="rolling"&&it.d)return false;
+  if(filters.chip==="active"&&!["Interested","Applying","Submitted"].includes(g.status))return false;
+  if(filters.search){const q=filters.search.toLowerCase();
+    const hay=(it.n+" "+it.c+" "+it.e+" "+it.t+" "+it.aw+" "+it.fit+" "+(it.w||"")).toLowerCase();
+    if(!hay.includes(q))return false;}
+  return true;
+}
+function sortList(list){const s=filters.sort;
+  return list.sort((x,y)=>{
+    if(s==="deadline")return dInfo(x).key-dInfo(y).key;
+    if(s==="award")return (y.a||0)-(x.a||0);
+    if(s==="fit")return (y.s?1:0)-(x.s?1:0)||dInfo(x).key-dInfo(y).key;
+    if(s==="name")return x.n.localeCompare(y.n);
+  });
+}
+function awHtml(s){return (s||"").replace(/(\$[\d.,]+K?M?\+?|€[\d.,]+M?|£[\d.,]+K?|up to [^,;]+|Fully funded|Free[, ]?|Equity-free|Non-dilutive|no equity|no-strings|\d+ ×? ?\$[\d.,]+K?)/ig,m=>`<b>${m}</b>`);}
+function tagsHtml(it){
+  const ndTag=it.nd?`<span class="tag nd-yes">💵 Non-dilutive</span>`:`<span class="tag nd-no">Equity</span>`;
+  return `<span class="tag t-type">${it.t}</span>${ndTag}<span class="tag e-${it.e}">${it.e}</span><span class="tag">${it.c}</span>`;
+}
+function statusSelect(it){const g=get(it.id),cur=g.status,by=(g.updated_by||"").replace(/"/g,'');
+  return `<select class="status st-${cur}" data-id="${it.id}" title="${by?'Last updated by '+by:''}">`+STATUSES.map(s=>`<option ${s===cur?"selected":""}>${s}</option>`).join("")+`</select>`;}
+
+const tbody=document.getElementById("tbody");
+function renderTable(){
+  const list=sortList(DATA.filter(matches));
+  document.getElementById("emptyMsg").classList.toggle("hidden",list.length>0);
+  tbody.innerHTML=list.map(it=>{const di=dInfo(it),g=get(it.id);
+    return `<tr class="row">
+      <td>${statusSelect(it)}</td>
+      <td><div class="name">${it.s?'<span class="star-i">★ </span>':''}<a href="${it.l}" target="_blank" rel="noopener">${it.n}</a></div><div class="fit">${it.fit}</div></td>
+      <td><div class="tags">${tagsHtml(it)}</div></td>
+      <td><span class="badge ${di.cls}">${di.label}</span></td>
+      <td class="award">${awHtml(it.aw)}</td>
+      <td><textarea class="notes" data-id="${it.id}" rows="1" placeholder="add note…">${(g.notes||"").replace(/</g,"&lt;")}</textarea></td>
+    </tr>`;}).join("");
+}
+const boardView=document.getElementById("boardView");
+function renderBoard(){
+  const list=DATA.filter(matches);
+  boardView.innerHTML=STATUSES.map(s=>{
+    const items=sortList(list.filter(it=>get(it.id).status===s));
+    return `<div class="col" data-status="${s}"><h3>${s} <span class="c">${items.length}</span></h3>
+      ${items.map(it=>{const di=dInfo(it);return `<div class="card" draggable="true" data-id="${it.id}">
+        <div class="cn">${it.s?'★ ':''}<a href="${it.l}" target="_blank" rel="noopener">${it.n}</a></div>
+        <div class="cm"><span class="tag ${it.nd?'nd-yes':'nd-no'}">${it.nd?'💵 ND':'Equity'}</span><span class="badge ${di.cls}">${di.label}</span></div>
+      </div>`}).join("")||'<div style="color:#5b6573;font-size:12px;text-align:center;padding:14px">—</div>'}</div>`;
+  }).join("");
+  let dragId=null;
+  boardView.querySelectorAll(".card").forEach(c=>{
+    c.addEventListener("dragstart",()=>{dragId=c.dataset.id;c.classList.add("drag");});
+    c.addEventListener("dragend",()=>c.classList.remove("drag"));});
+  boardView.querySelectorAll(".col").forEach(col=>{
+    col.addEventListener("dragover",e=>{e.preventDefault();col.classList.add("over");});
+    col.addEventListener("dragleave",()=>col.classList.remove("over"));
+    col.addEventListener("drop",e=>{e.preventDefault();col.classList.remove("over");
+      if(dragId){get(dragId).status=col.dataset.status;commit(dragId);render();}});});
+}
+function renderHero(){
+  const up=DATA.map(it=>({it,di:dInfo(it)})).filter(o=>o.di.days>=0&&o.it.d).sort((a,b)=>a.di.days-b.di.days).slice(0,10);
+  document.getElementById("hero").innerHTML=up.map(({it,di})=>`
+    <a class="dcard ${di.days<=7?'u':''}" href="${it.l}" target="_blank" rel="noopener">
+      <div class="dd">${di.days===0?'TODAY':di.days+' days left'}</div>
+      <div class="dn">${it.s?'★ ':''}${it.n}</div>
+      <div class="da">${it.aw}</div>
+      <div class="dg">${it.w} · ${it.nd?'💵 Non-dilutive':'Equity'}</div>
+    </a>`).join("")||'<div style="color:#5b6573">No dated deadlines upcoming.</div>';
+}
+function renderStats(){
+  const total=DATA.length;let urgent=0,soon=0,fit=0,active=0,won=0;
+  DATA.forEach(it=>{const di=dInfo(it),g=get(it.id);
+    if(di.days>=0&&di.days<=7)urgent++; else if(di.days>7&&di.days<=30)soon++;
+    if(it.s)fit++; if(["Interested","Applying","Submitted"].includes(g.status))active++; if(g.status==="Won")won++;});
+  document.getElementById("stats").innerHTML=`
+    <div class="stat" data-chip="all"><div class="n">${total}</div><div class="l">Programs</div></div>
+    <div class="stat urgent" data-chip="urgent"><div class="n">${urgent}</div><div class="l">≤7 days ⚠</div></div>
+    <div class="stat soon" data-chip=""><div class="n">${soon}</div><div class="l">8–30 days</div></div>
+    <div class="stat fit" data-chip="star"><div class="n">${fit}</div><div class="l">★ Top fits</div></div>
+    <div class="stat" data-chip="active"><div class="n">${active}</div><div class="l">In progress</div></div>
+    <div class="stat won" data-chip=""><div class="n">${won}</div><div class="l">Won 🏆</div></div>`;
+  document.querySelectorAll(".stat[data-chip]").forEach(s=>s.addEventListener("click",()=>{
+    const c=s.dataset.chip; if(!c)return; setChip(c);}));
+  document.getElementById("sub").textContent=`${total} non-dilutive-first programs · ${fit} top fits · tracking ${active} in progress · saved locally · ${new Date().toLocaleDateString()}`;
+}
+function render(){renderStats();renderHero();boardMode?renderBoard():renderTable();}
+
+// filters
+const uniq=k=>[...new Set(DATA.map(d=>d[k]))].sort();
+const cf=document.getElementById("catFilter");uniq("c").forEach(c=>cf.add(new Option(c,c)));
+const tf=document.getElementById("typeFilter");uniq("t").forEach(c=>tf.add(new Option(c,c)));
+const ef=document.getElementById("eligFilter");uniq("e").forEach(c=>ef.add(new Option(c,c)));
+const sf=document.getElementById("statusFilter");STATUSES.forEach(s=>sf.add(new Option(s,s)));
+const CHIPS=[["all","All"],["star","★ Top fits"],["nd","💵 Non-dilutive only"],["urgent","⚠ Closing ≤14d"],["open","No-gate"],["rolling","Rolling/always-open"],["active","In progress"]];
+function renderChips(){document.getElementById("chips").innerHTML=CHIPS.map(c=>`<span class="chip ${c[0]==='star'?'star':''} ${c[0]==='nd'?'nd':''} ${c[0]===filters.chip?'active':''}" data-chip="${c[0]}">${c[1]}</span>`).join("");
+  document.querySelectorAll(".chip").forEach(ch=>ch.addEventListener("click",()=>setChip(ch.dataset.chip)));}
+function setChip(c){filters.chip=c;renderChips();render();}
+renderChips();
+document.getElementById("search").addEventListener("input",e=>{filters.search=e.target.value;render();});
+cf.addEventListener("change",e=>{filters.cat=e.target.value;render();});
+tf.addEventListener("change",e=>{filters.type=e.target.value;render();});
+ef.addEventListener("change",e=>{filters.elig=e.target.value;render();});
+sf.addEventListener("change",e=>{filters.status=e.target.value;render();});
+document.getElementById("sort").addEventListener("change",e=>{filters.sort=e.target.value;render();});
+document.querySelectorAll("th[data-s]").forEach(th=>th.addEventListener("click",()=>{
+  const m={name:"name",deadline:"deadline",award:"award",type:"fit"}; const s=m[th.dataset.s];
+  if(s){filters.sort=s;document.getElementById("sort").value=s;render();}}));
+document.addEventListener("change",e=>{if(e.target.classList.contains("status")){get(e.target.dataset.id).status=e.target.value;commit(e.target.dataset.id);render();}});
+document.addEventListener("input",e=>{if(e.target.classList.contains("notes")){get(e.target.dataset.id).notes=e.target.value;commitDebounced(e.target.dataset.id);}});
+document.getElementById("viewBtn").addEventListener("click",()=>{boardMode=!boardMode;
+  document.getElementById("tableView").classList.toggle("hidden",boardMode);
+  document.getElementById("boardView").classList.toggle("hidden",!boardMode);
+  document.getElementById("viewBtn").textContent=boardMode?"☰ Table view":"▦ Board view";render();});
+document.getElementById("exportBtn").addEventListener("click",()=>{
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bemellou-pipeline-progress.json";a.click();});
+document.getElementById("importBtn").addEventListener("click",()=>document.getElementById("importFile").click());
+document.getElementById("importFile").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=()=>{try{Object.assign(state,JSON.parse(r.result));saveLocal();if(cloud)Object.keys(state).forEach(id=>commit(id));render();alert("Progress imported.");}catch(err){alert("Could not read that file.");}};r.readAsText(f);});
+render();updateWho();initCloud();
+</script>
+</body>
+</html>
