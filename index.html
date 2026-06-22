@@ -371,8 +371,8 @@ const DATA=[
 
 // ---- state (local cache + optional Supabase team sync) ----
 const LSKEY="bemellouPipelineV2";
-const SUPA_URL="%%SUPABASE_URL%%";      // injected on publish
-const SUPA_KEY="%%SUPABASE_ANON_KEY%%"; // anon key — safe to be public (protected by table policy)
+const SUPA_URL="https://fwhqzulaqwjyubcyijil.supabase.co";      // injected on publish
+const SUPA_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZ3aHF6dWxhcXdqeXViY3lpamlsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIxNjE1NDksImV4cCI6MjA5NzczNzU0OX0.qe-_cn2gKL4SbvUthiCwEKqZybhtjq7C_4Xju7GoqOA"; // anon key — safe to be public (protected by table policy)
 let state=JSON.parse(localStorage.getItem(LSKEY)||"{}");
 let cloud=null, USER=localStorage.getItem("pipelineUser")||"", noteTimers={};
 function saveLocal(){localStorage.setItem(LSKEY,JSON.stringify(state))}
