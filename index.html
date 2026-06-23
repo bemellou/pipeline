@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bemellou — Funding Pipeline</title>
+<meta name="robots" content="noindex,nofollow">
 <style>
   :root{
     --bg:#0e1014; --panel:#161922; --panel2:#1d212c; --line:#2a3040; --line2:#353c4d;
@@ -163,6 +164,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* ---- light team passcode gate (deterrent; data is non-sensitive) ---- */
+(function(){var GATE="bemellou26";
+  if(localStorage.getItem("pipelineGate")===GATE)return;
+  var p=prompt("🔒 Team passcode for the Bemellou pipeline:");
+  if(p===GATE){localStorage.setItem("pipelineGate",GATE);return;}
+  document.documentElement.innerHTML='<body style="background:#0e1014;color:#98a2b3;font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0"><div style="text-align:center"><h2 style="color:#eef1f7">🔒 Locked</h2><p>Wrong passcode — refresh to try again.</p></div></body>';
+  throw new Error("locked");})();
 const STATUSES=["Backlog","Interested","Applying","Submitted","Won","Rejected","Skip"];
 // d=deadline ISO|null · w=display · a=rough $ for sort · t=type · nd=non-dilutive · s=star top-fit · c=theme · e=eligibility gate
 const DATA=[
