@@ -30,7 +30,7 @@
   .stat:hover{border-color:var(--accent)}
   .stat .n{font-size:23px;font-weight:800;line-height:1}
   .stat .l{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:5px}
-  .stat.urgent .n{color:var(--red)} .stat.soon .n{color:var(--amber)} .stat.fit .n{color:var(--accent2)} .stat.won .n{color:var(--green)}
+  .stat.urgent .n{color:var(--red)} .stat.soon .n{color:var(--amber)} .stat.fit .n{color:var(--accent2)} .stat.won .n{color:var(--green)} .stat.now .n{color:var(--green)}
   /* closing-soon hero */
   .hero{padding:14px 26px 16px;border-bottom:1px solid var(--line);background:linear-gradient(180deg,#12151d,#0e1014)}
   .hero-h{font-size:11px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin-bottom:9px;font-weight:700}
@@ -429,6 +429,12 @@ function dInfo(it){
   const lbl=days<0?("Passed · "+it.w):(it.w+" · "+(days===0?"today!":days+"d"));
   return {cls,label:lbl,days,key:days>=0?days:(990000+days)};
 }
+function isOpenNow(it){
+  if(it.d) return dInfo(it).days>=0;               // dated & not passed
+  var w=(it.w||"").toLowerCase();
+  if(/opens|reopens|next window|next cohort|watch 20|closed|202[789]/.test(w)) return false; // opens-later / future-year
+  return /rolling|monthly|weekly|daily|ongoing|open now|apply now|year-round|priority|open/.test(w);
+}
 function matches(it){
   const g=get(it.id);
   if(filters.cat&&it.c!==filters.cat)return false;
@@ -440,6 +446,7 @@ function matches(it){
   if(filters.chip==="urgent"){const di=dInfo(it);if(di.days>14||di.days<0)return false;}
   if(filters.chip==="open"&&it.e!=="Open")return false;
   if(filters.chip==="rolling"&&it.d)return false;
+  if(filters.chip==="opennow"&&!isOpenNow(it))return false;
   if(filters.chip==="active"&&!["Interested","Applying","Submitted"].includes(g.status))return false;
   if(filters.search){const q=filters.search.toLowerCase();
     const hay=(it.n+" "+it.c+" "+it.e+" "+it.t+" "+it.aw+" "+it.fit+" "+(it.w||"")).toLowerCase();
@@ -508,12 +515,14 @@ function renderHero(){
     </a>`).join("")||'<div style="color:#5b6573">No dated deadlines upcoming.</div>';
 }
 function renderStats(){
-  const total=DATA.length;let urgent=0,soon=0,fit=0,active=0,won=0;
+  const total=DATA.length;let urgent=0,soon=0,fit=0,active=0,won=0,opennow=0;
   DATA.forEach(it=>{const di=dInfo(it),g=get(it.id);
     if(di.days>=0&&di.days<=7)urgent++; else if(di.days>7&&di.days<=30)soon++;
+    if(isOpenNow(it))opennow++;
     if(it.s)fit++; if(["Interested","Applying","Submitted"].includes(g.status))active++; if(g.status==="Won")won++;});
   document.getElementById("stats").innerHTML=`
     <div class="stat" data-chip="all"><div class="n">${total}</div><div class="l">Programs</div></div>
+    <div class="stat now" data-chip="opennow"><div class="n">${opennow}</div><div class="l">🟢 Open now</div></div>
     <div class="stat urgent" data-chip="urgent"><div class="n">${urgent}</div><div class="l">≤7 days ⚠</div></div>
     <div class="stat soon" data-chip=""><div class="n">${soon}</div><div class="l">8–30 days</div></div>
     <div class="stat fit" data-chip="star"><div class="n">${fit}</div><div class="l">★ Top fits</div></div>
@@ -531,7 +540,7 @@ const cf=document.getElementById("catFilter");uniq("c").forEach(c=>cf.add(new Op
 const tf=document.getElementById("typeFilter");uniq("t").forEach(c=>tf.add(new Option(c,c)));
 const ef=document.getElementById("eligFilter");uniq("e").forEach(c=>ef.add(new Option(c,c)));
 const sf=document.getElementById("statusFilter");STATUSES.forEach(s=>sf.add(new Option(s,s)));
-const CHIPS=[["all","All"],["star","★ Top fits"],["nd","💵 Non-dilutive only"],["urgent","⚠ Closing ≤14d"],["open","No-gate"],["rolling","Rolling/always-open"],["active","In progress"]];
+const CHIPS=[["all","All"],["opennow","🟢 Open now"],["star","★ Top fits"],["nd","💵 Non-dilutive only"],["urgent","⚠ Closing ≤14d"],["open","No-gate"],["rolling","Rolling/always-open"],["active","In progress"]];
 function renderChips(){document.getElementById("chips").innerHTML=CHIPS.map(c=>`<span class="chip ${c[0]==='star'?'star':''} ${c[0]==='nd'?'nd':''} ${c[0]===filters.chip?'active':''}" data-chip="${c[0]}">${c[1]}</span>`).join("");
   document.querySelectorAll(".chip").forEach(ch=>ch.addEventListener("click",()=>setChip(ch.dataset.chip)));}
 function setChip(c){filters.chip=c;renderChips();render();}
