@@ -63,6 +63,8 @@
   .fit{color:var(--muted);font-size:12px;margin-top:3px;max-width:360px}
   .star-i{color:var(--accent2)}
   .rank{display:inline-block;background:var(--accent);color:#0a0f1a;font-weight:800;font-size:11px;padding:1px 8px;border-radius:6px;margin-right:3px;vertical-align:middle}
+  tr.grp td{background:linear-gradient(90deg,#161b26,#12151d);color:#eef1f7;font-weight:800;font-size:12.5px;letter-spacing:.3px;padding:14px 12px 8px;border-bottom:2px solid var(--accent2);border-top:1px solid var(--line2)}
+  .gc{background:var(--chip);color:var(--muted);font-weight:700;font-size:11px;padding:1px 9px;border-radius:20px;margin-left:8px}
   .badge{display:inline-block;padding:3px 9px;border-radius:7px;font-size:11px;font-weight:700;white-space:nowrap}
   .b-urgent{background:rgba(236,100,121,.16);color:#ff8c9c} .b-soon{background:rgba(231,177,90,.16);color:#f2c987}
   .b-ok{background:rgba(70,192,138,.14);color:#84d6ae} .b-roll{background:#222838;color:#aeb6c4} .b-win{background:#222838;color:#8a93a3} .b-past{background:#191c23;color:var(--gray)}
@@ -430,7 +432,7 @@ async function initCloud(){
     updateWho();render();
   }catch(e){console.warn(e);setConn("err","● Offline — couldn't reach team database");}
 }
-let filters={search:"",cat:"",type:"",elig:"",status:"",sort:"priority",chip:"all"};
+let filters={search:"",cat:"",type:"",elig:"",status:"",sort:"priority",chip:"opennow"};
 let boardMode=false;
 
 function dInfo(it){
@@ -468,6 +470,22 @@ function score(it){
   if(["Interested","Applying"].includes(g.status)) s+=10; // keep momentum
   return s;
 }
+// section buckets for the ranked view (o = display order)
+var BUCKETS={
+  1:{o:1,t:"🔥 Apply now — no gate, you qualify"},
+  2:{o:2,t:"🔒 Apply now — if a co-founder qualifies (women / BIPOC / regional)"},
+  3:{o:3,t:"⏳ In progress"},
+  6:{o:4,t:"📅 Opens later / annual — not open yet"},
+  4:{o:5,t:"✅ Submitted / won"},
+  5:{o:6,t:"✋ Rejected / skipped"}
+};
+function bucket(it){var st=get(it.id).status;
+  if(["Submitted","Won"].includes(st))return 4;
+  if(["Rejected","Skip"].includes(st))return 5;
+  if(["Interested","Applying"].includes(st))return 3;
+  if(!isOpenNow(it))return 6;
+  return (it.e==="Open"||it.e==="Student")?1:2;
+}
 function matches(it){
   const g=get(it.id);
   if(filters.cat&&it.c!==filters.cat)return false;
@@ -488,7 +506,7 @@ function matches(it){
 }
 function sortList(list){const s=filters.sort;
   return list.sort((x,y)=>{
-    if(s==="priority")return score(y)-score(x)||dInfo(x).key-dInfo(y).key;
+    if(s==="priority"){var bx=BUCKETS[bucket(x)].o,by=BUCKETS[bucket(y)].o; if(bx!==by)return bx-by; return score(y)-score(x)||dInfo(x).key-dInfo(y).key;}
     if(s==="deadline")return dInfo(x).key-dInfo(y).key;
     if(s==="award")return (y.a||0)-(x.a||0);
     if(s==="fit")return (y.s?1:0)-(x.s?1:0)||dInfo(x).key-dInfo(y).key;
@@ -507,17 +525,19 @@ const tbody=document.getElementById("tbody");
 function renderTable(){
   const list=sortList(DATA.filter(matches));
   document.getElementById("emptyMsg").classList.toggle("hidden",list.length>0);
-  const showRank=filters.sort==="priority"; let rk=0;
-  tbody.innerHTML=list.map(it=>{const di=dInfo(it),g=get(it.id);
-    let rankBadge=""; if(showRank&&score(it)>=0){rk++;rankBadge=`<span class="rank">#${rk}</span> `;}
-    return `<tr class="row">
+  const showRank=filters.sort==="priority"; let rk=0, curB=null, html="";
+  list.forEach(it=>{const di=dInfo(it),g=get(it.id);
+    if(showRank){const b=bucket(it); if(b!==curB){curB=b; const cnt=list.filter(x=>bucket(x)===b).length; html+=`<tr class="grp"><td colspan="6">${BUCKETS[b].t} <span class="gc">${cnt}</span></td></tr>`;}}
+    let rankBadge=""; if(showRank&&(bucket(it)===1||bucket(it)===2)){rk++;rankBadge=`<span class="rank">#${rk}</span> `;}
+    html+=`<tr class="row">
       <td>${statusSelect(it)}</td>
       <td><div class="name">${rankBadge}${it.s?'<span class="star-i">★ </span>':''}<a href="${it.l}" target="_blank" rel="noopener">${it.n}</a></div><div class="fit">${it.fit}</div></td>
       <td><div class="tags">${tagsHtml(it)}</div></td>
       <td><span class="badge ${di.cls}">${di.label}</span></td>
       <td class="award">${awHtml(it.aw)}</td>
       <td><textarea class="notes" data-id="${it.id}" rows="1" placeholder="add note…">${(g.notes||"").replace(/</g,"&lt;")}</textarea></td>
-    </tr>`;}).join("");
+    </tr>`;});
+  tbody.innerHTML=html;
 }
 const boardView=document.getElementById("boardView");
 function renderBoard(){
